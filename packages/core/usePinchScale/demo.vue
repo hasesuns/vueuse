@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { usePinchGesture } from '@vueuse/core'
+import { usePinchScale } from '@vueuse/core'
 import { reactive, ref } from 'vue'
 
 const target = ref<HTMLElement | null>(null)
 const options = { target }
-const pinchGestureScale = reactive(usePinchGesture(options))
+const pinchGestureScale = reactive(usePinchScale(options))
 </script>
 
 <template>

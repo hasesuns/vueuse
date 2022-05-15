@@ -31,10 +31,10 @@ const getTouchDistance = (event: TouchEvent): number => {
 /**
  * Pinch Gesture detection.
  *
- * @see https://vueuse.org/usePinchGesture
+ * @see https://vueuse.org/usePinchScale
  * @param options
  */
-export function usePinchGesture(options: PinchGestureOptions = {}) {
+export function usePinchScale(options: PinchGestureOptions = {}) {
   const {
     preventDefault = true,
     window = defaultWindow,
