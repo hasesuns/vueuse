@@ -9,8 +9,19 @@ Reactive pinch gesture scale.
 
 ## Usage
 
-```ts
-import { usePinchScale } from '@vueuse/core'
+```html
+<script setup>
+import { ref, reactive } from 'vue'
+import { usePinchScale, PinchScaleOptions } from '@vueuse/core'
 
-const { scale } = usePinchScale()
+const pinchScaleArea = ref<HTMLElement | null>(null)
+const options = { preventDefault: true, target: pinchScaleArea }
+const pinchScale = reactive(usePinchScale(options))
+</script>
+
+<template>
+  <div ref="pinchScaleArea">
+      Pinch Scale Area
+  </div>
+</template>
 ```

@@ -2,20 +2,20 @@
 import { usePinchScale } from '@vueuse/core'
 import { reactive, ref } from 'vue'
 
-const target = ref<HTMLElement | null>(null)
-const options = { target }
-const pinchGestureScale = reactive(usePinchScale(options))
+const pinchScaleArea = ref<HTMLElement | null>(null)
+const options = { preventDefault: true, target: pinchScaleArea }
+const pinchScale = reactive(usePinchScale(options))
 </script>
 
 <template>
   <div
-    ref="target"
+    ref="pinchScaleArea"
     class="h-40 mb-10 bg-[#3eaf7c] flex items-center justify-center rounded"
     style="border-radius"
   >
     <p class="text-white">
-      Pinch Gesture Target
+      Pinch Scale Area
     </p>
   </div>
-  <pre lang="yaml">{{ pinchGestureScale }}</pre>
+  <pre lang="yaml">{{ pinchScale }}</pre>
 </template>

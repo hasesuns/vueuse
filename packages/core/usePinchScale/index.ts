@@ -1,4 +1,5 @@
 import type { MaybeRef } from '@vueuse/shared'
+import { clamp } from '@vueuse/shared'
 import { computed, ref, unref } from 'vue-demi'
 import type { MaybeElementRef } from '../unrefElement'
 import { unrefElement } from '../unrefElement'
@@ -6,7 +7,7 @@ import { useEventListener } from '../useEventListener'
 import type { ConfigurableWindow } from '../_configurable'
 import { defaultWindow } from '../_configurable'
 
-export interface PinchGestureOptions extends ConfigurableWindow {
+export interface PinchScaleOptions extends ConfigurableWindow {
   /**
    * Prevent events defaults on pinch gesture
    *
@@ -17,6 +18,7 @@ export interface PinchGestureOptions extends ConfigurableWindow {
   /**
    * Element target to be capture the pinch start
    *
+   * @default window
    */
   target?: MaybeElementRef
 }
@@ -29,12 +31,12 @@ const getTouchDistance = (event: TouchEvent): number => {
 }
 
 /**
- * Pinch Gesture detection.
+ * Pinch Scale detection.
  *
  * @see https://vueuse.org/usePinchScale
  * @param options
  */
-export function usePinchScale(options: PinchGestureOptions = {}) {
+export function usePinchScale(options: PinchScaleOptions) {
   const {
     preventDefault = true,
     window = defaultWindow,
@@ -74,22 +76,27 @@ export function usePinchScale(options: PinchGestureOptions = {}) {
       isTouchPinching.value = false
   }
 
+  const MIN_FACTOR = 0.125
+  const MAX_FACTOR = 4
   const onTrackpadPinch = (event: WheelEvent) => {
-    // Event ctrlKey detects if touchpad action is executing wheel or pinch gesture
+    // Event ctrlKey detects if touchpad action is executing scroll gesture or pinch gesture
     if (event.ctrlKey) {
       if (unref(preventDefault))
         event.preventDefault()
-      const delta = event.deltaY * 0.01
-      scale.value -= delta
-      startTouchDistance.value = event.deltaY
-      currentTouchDistance.value = event.deltaY
+      let factor = event.deltaY <= 0
+        ? 1 - event.deltaY / 100
+        : 1 / (1 + event.deltaY / 100)
+      factor = clamp(factor, MIN_FACTOR, MAX_FACTOR)
+      scale.value *= factor
     }
   }
 
   if (target) {
+    // For touch device
     useEventListener(target, 'touchstart', onTouchStart, { passive: !unref(preventDefault) })
     useEventListener(window, 'touchmove', onTouchMove, { passive: !unref(preventDefault) })
-    useEventListener(window, 'touchend', onTouchEnd, { passive: true })
+    useEventListener(window, 'touchend', onTouchEnd, { passive: !unref(preventDefault) })
+    // For trackpad device
     useEventListener(target, 'wheel', onTrackpadPinch, { passive: !unref(preventDefault) })
   }
   return { scale }
