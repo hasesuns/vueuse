@@ -21,12 +21,31 @@ export interface PinchScaleOptions extends ConfigurableWindow {
    * @default window
    */
   target?: MaybeElementRef
+
+  /**
+   * Callback on touch start
+   */
+  onTouchStartCallback?: (event: TouchEvent) => void
+
+  /**
+   * Callback on touch move
+   */
+  onTouchMoveCallback?: (event: TouchEvent) => void
+
+  /**
+   * Callback on touch end
+   */
+  onTouchEndCallback?: (event: TouchEvent) => void
+
+  /**
+   * Callback on trackpad wheel pinch
+   */
+  onTrackpadPinchCallback?: (event: WheelEvent) => void
 }
 
 const getTouchDistance = (event: TouchEvent): number => {
   return Math.sqrt(
-    Math.pow(event.touches[0].pageX - event.touches[1].pageX, 2)
-      + Math.pow(event.touches[0].pageY - event.touches[1].pageY, 2),
+    Math.pow(event.touches[0].pageX - event.touches[1].pageX, 2) + Math.pow(event.touches[0].pageY - event.touches[1].pageY, 2),
   )
 }
 
@@ -40,6 +59,10 @@ export function usePinchScale(options: PinchScaleOptions) {
   const {
     preventDefault = true,
     window = defaultWindow,
+    onTouchStartCallback,
+    onTouchMoveCallback,
+    onTouchEndCallback,
+    onTrackpadPinchCallback,
   } = options
 
   const scale = ref(1)
@@ -60,6 +83,7 @@ export function usePinchScale(options: PinchScaleOptions) {
       startTouchDistance.value = getTouchDistance(event)
       currentTouchDistance.value = startTouchDistance.value
       startTouchScale.value = scale.value
+      onTouchStartCallback?.(event)
     }
   }
   const onTouchMove = (event: TouchEvent) => {
@@ -69,11 +93,14 @@ export function usePinchScale(options: PinchScaleOptions) {
       currentTouchDistance.value = getTouchDistance(event)
       const proportion = currentTouchDistance.value / startTouchDistance.value
       scale.value = startTouchScale.value * proportion
+      onTouchMoveCallback?.(event)
     }
   }
-  const onTouchEnd = (_event: TouchEvent) => {
-    if (isTouchPinching.value)
+  const onTouchEnd = (event: TouchEvent) => {
+    if (isTouchPinching.value) {
       isTouchPinching.value = false
+      onTouchEndCallback?.(event)
+    }
   }
 
   const MIN_FACTOR = 0.125
@@ -88,6 +115,7 @@ export function usePinchScale(options: PinchScaleOptions) {
         : 1 / (1 + event.deltaY / 100)
       factor = clamp(factor, MIN_FACTOR, MAX_FACTOR)
       scale.value *= factor
+      onTrackpadPinchCallback?.(event)
     }
   }
 
