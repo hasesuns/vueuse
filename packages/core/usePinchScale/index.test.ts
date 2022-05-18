@@ -1,3 +1,4 @@
+import type { PinchScaleOptions } from '.'
 import { usePinchScale } from '.'
 
 describe('usePinchScale', () => {
@@ -76,6 +77,14 @@ describe('usePinchScale', () => {
   let onTouchEndCallback: any
   let onTrackpadPinchCallback: any
 
+  const options = (): PinchScaleOptions => ({
+    target: pinchTarget,
+    onTouchStartCallback,
+    onTouchMoveCallback,
+    onTouchEndCallback,
+    onTrackpadPinchCallback,
+  })
+
   beforeEach(() => {
     onTouchStartCallback = vitest.fn((_e: TouchEvent) => { })
     onTouchMoveCallback = vitest.fn((_e: TouchEvent) => { })
@@ -122,13 +131,7 @@ describe('usePinchScale', () => {
   }
 
   it('simple pinch out on touch device', () => {
-    const { scale } = usePinchScale(
-      {
-        target: pinchTarget,
-        onTouchStartCallback,
-        onTouchMoveCallback,
-        onTouchEndCallback,
-      })
+    const { scale } = usePinchScale(options())
 
     const startScale = scale.value
     mockTouchPinchEvents(pinchTarget, [startPinchPosition, bigPinchPosition, bigPinchPosition])
@@ -141,13 +144,7 @@ describe('usePinchScale', () => {
   })
 
   it('simple pinch in on touch device', () => {
-    const { scale } = usePinchScale(
-      {
-        target: pinchTarget,
-        onTouchStartCallback,
-        onTouchMoveCallback,
-        onTouchEndCallback,
-      })
+    const { scale } = usePinchScale(options())
 
     const startScale = scale.value
     mockTouchPinchEvents(pinchTarget, [startPinchPosition, smallPinchPosition, smallPinchPosition])
@@ -160,13 +157,7 @@ describe('usePinchScale', () => {
   })
 
   it('simple pinch in and out on touch device', () => {
-    const { scale } = usePinchScale(
-      {
-        target: pinchTarget,
-        onTouchStartCallback,
-        onTouchMoveCallback,
-        onTouchEndCallback,
-      })
+    const { scale } = usePinchScale(options())
 
     const startScale = scale.value
     mockTouchPinchEvents(pinchTarget, [startPinchPosition, smallPinchPosition, startPinchPosition, startPinchPosition])
@@ -179,11 +170,7 @@ describe('usePinchScale', () => {
   })
 
   it('simple pinch out on trackpad device', () => {
-    const { scale } = usePinchScale(
-      {
-        target: pinchTarget,
-        onTrackpadPinchCallback,
-      })
+    const { scale } = usePinchScale(options())
 
     const startScale = scale.value
     mockTrackpadPinchEvent(pinchTarget, -10)
@@ -194,11 +181,7 @@ describe('usePinchScale', () => {
   })
 
   it('simple pinch in on trackpad device', () => {
-    const { scale } = usePinchScale(
-      {
-        target: pinchTarget,
-        onTrackpadPinchCallback,
-      })
+    const { scale } = usePinchScale(options())
 
     const startScale = scale.value
     mockTrackpadPinchEvent(pinchTarget, 10)
@@ -209,11 +192,7 @@ describe('usePinchScale', () => {
   })
 
   it('simple pinch in and out on trackpad device', () => {
-    const { scale } = usePinchScale(
-      {
-        target: pinchTarget,
-        onTrackpadPinchCallback,
-      })
+    const { scale } = usePinchScale(options())
 
     const startScale = scale.value
     mockTrackpadPinchEvent(pinchTarget, 10)
