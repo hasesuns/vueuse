@@ -23,6 +23,20 @@ export interface PinchScaleOptions extends ConfigurableWindow {
   target?: MaybeElementRef
 
   /**
+   * Minimum scale value
+   *
+   * @default 0.01
+   */
+  minScale?: MaybeRef<number>
+
+  /**
+   * Maximum scale value
+   *
+   * @default 100
+   */
+  maxScale?: MaybeRef<number>
+
+  /**
    * Callback on touch start
    */
   onTouchStartCallback?: (event: TouchEvent) => void
@@ -59,6 +73,8 @@ export function usePinchScale(options: PinchScaleOptions) {
   const {
     preventDefault = true,
     window = defaultWindow,
+    minScale = 0.01,
+    maxScale = 100,
     onTouchStartCallback,
     onTouchMoveCallback,
     onTouchEndCallback,
@@ -114,7 +130,7 @@ export function usePinchScale(options: PinchScaleOptions) {
         ? 1 - event.deltaY / 100
         : 1 / (1 + event.deltaY / 100)
       factor = clamp(factor, MIN_FACTOR, MAX_FACTOR)
-      scale.value *= factor
+      scale.value = clamp(scale.value * factor, unref(minScale), unref(maxScale))
       onTrackpadPinchCallback?.(event)
     }
   }
